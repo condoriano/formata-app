@@ -140,7 +140,7 @@ watch(selectedTactic, (newVal) => {
                 transform: 'translate(-50%, -50%)',
               }"
             >
-              <img src="@/assets/tshirt.png" alt="" class="w-14 h-12 absolute" />
+              <img src="@/assets/shirt.png" alt="" class="w-14 h-12 absolute" />
               <div
                 class="relative w-14 h-12 text-red-800 flex flex-col items-center justify-center font-bold text-sm text-center p-0 m-0"
               >

@@ -20,7 +20,7 @@ const exportFieldAsJPEG = async () => {
 
   const canvas = await html2canvas(fieldRef.value, {
     backgroundColor: '#32CD32',
-    scale: 1,
+    scale: 2,
   })
 
   const link = document.createElement('a')
@@ -35,14 +35,16 @@ const players = ref([
   { number: 1, position: 'gk', name: 'Паша', nickname: 'Roxman_ua' },
   { number: 6, position: 'lcb', name: 'Паша', nickname: 'Mr_Filnyuk' },
   { number: 42, position: 'rcb', name: 'Влад', nickname: 'zouonrails' },
-  { number: 21, position: 'rcb', name: 'Степан', nickname: 'skoromniy8' },
+  { number: 21, position: 'rb', name: 'Степан', nickname: 'skoromniy8' },
   { number: 31, position: 'rcb', name: 'Елік', nickname: 'stealth-maze7' },
   { number: 2, position: 'lb', name: 'Анатолій', nickname: 'Dawa-bro' },
-  { number: 13, position: 'rcb', name: 'Артур', nickname: 'Ur mom s dad503' },
+  { number: 13, position: 'cdm', name: 'Артур', nickname: 'Ur mom s dad503' },
   { number: 9, position: 'rcb', name: 'Вася', nickname: 'Vasya_Boyko11' },
-  { number: 5, position: 'rcb', name: 'Іван', nickname: 'ivan052000' },
+  { number: 5, position: 'rcm', name: 'Іван', nickname: 'ivan052000' },
   { number: 7, position: 'lw', name: 'Андрій', nickname: 'Narutooaa' },
-  { number: 99, position: 'rcb', name: 'Діма', nickname: 'Swarthy-Handlle5' },
+  { number: 0, position: 'lcm', name: 'Kevin', nickname: 'KevinSinister' },
+  { number: 0, position: 'st', name: 'Slasherlazy', nickname: 'Slasherlazy' },
+  { number: 99, position: 'rw', name: 'Діма', nickname: 'Swarthy-Handlle5' },
 ])
 
 const availablePositions = [
@@ -86,13 +88,13 @@ const formations: Record<string, Formation> = {
       { x: 61, y: 71, name: 'rcb' },
       { x: 39, y: 71, name: 'lcb' },
       { x: 19, y: 65, name: 'lb' },
-      { x: 80, y: 65, name: 'rb' },
-      { x: 37, y: 41, name: 'lcm' },
-      { x: 63, y: 41, name: 'rcm' },
+      { x: 81, y: 65, name: 'rb' },
+      { x: 35, y: 41, name: 'lcm' },
+      { x: 65, y: 41, name: 'rcm' },
       { x: 50, y: 54, name: 'cdm' },
       { x: 19, y: 23, name: 'lw' },
       { x: 80, y: 23, name: 'rw' },
-      { x: 50, y: 13, name: 'st' },
+      { x: 50, y: 16, name: 'st' },
     ],
   },
 }
@@ -123,6 +125,11 @@ watch(selectedTactic, (newVal) => {
       <div class="p-0">
         <div class="shadow-black/50 shadow-md m-4">
           <div id="field" ref="fieldRef" class="">
+            <img
+              src="@/assets/field-bg.png"
+              alt=""
+              style="display: block; width: 100%; height: 100%"
+            />
             <div
               v-for="(pos, index) in currentFormation.positions"
               :key="index"
@@ -133,14 +140,15 @@ watch(selectedTactic, (newVal) => {
                 transform: 'translate(-50%, -50%)',
               }"
             >
+              <img src="@/assets/tshirt.png" alt="" class="w-14 h-12 absolute" />
               <div
-                class="w-12 h-12 bg-white text-green-800 rounded-full flex flex-col items-center justify-center font-bold text-md border-2 border-green-600 text-center p-0 m-0"
+                class="relative w-14 h-12 text-red-800 flex flex-col items-center justify-center font-bold text-sm text-center p-0 m-0"
               >
                 {{ findPlayerByPosition(pos.name)?.number || pos.name.toUpperCase() }}
               </div>
 
               <div
-                class="font-bold text-white text-center w-max max-w-[150px] p-0 m-0 text-sm"
+                class="font-bold text-white text-center w-max max-w-[150px] p-0 m-0 text-xs uppercase"
                 style="text-shadow: black 0px 0px 3px"
                 v-html="findPlayerByPosition(pos.name)?.nickname || '&nbsp;'"
               ></div>
@@ -232,8 +240,6 @@ watch(selectedTactic, (newVal) => {
 #field {
   width: 540px;
   height: 446px;
-  background-image: url('@/assets/field-bg.png');
-  background-size: contain;
   position: relative;
 }
 </style>

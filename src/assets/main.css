@@ -1,35 +1,31 @@
-@import './base.css';
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+@import 'tailwindcss';
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+@theme {
+  --font-ubuntu: Ubuntu, 'sans-serif';
+  --font-ubuntu-mono: 'Ubuntu Mono', monospace;
+
+  --color-white: white;
+  --color-green-200: #e6ffe8;
+  --color-green-300: #e6ffe8;
+  --color-green-500: #22c55e;
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+  --color-green-800: #115829;
+
+  --color-gray-50: #fafafd;
+  --color-gray-200: #eceefa;
+  --color-gray-300: #dde1f5;
+  --color-gray-700: #3a4266;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+html,
+body {
+  padding: 0;
+  margin: 0;
+  @apply font-ubuntu;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+img {
+  @apply inline-block;
 }

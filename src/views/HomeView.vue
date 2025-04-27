@@ -97,6 +97,43 @@ const formations: Record<string, Formation> = {
       { x: 50, y: 16, name: 'st' },
     ],
   },
+  '4-5-1': {
+    name: '4-5-1',
+    positions: [
+      { x: 50, y: 90, name: 'gk' },
+      { x: 61, y: 66, name: 'rcb' },
+      { x: 39, y: 66, name: 'lcb' },
+      { x: 17, y: 66, name: 'lb' },
+      { x: 82, y: 66, name: 'rb' },
+
+      { x: 12, y: 40, name: 'lw' },
+      { x: 31, y: 40, name: 'lcm' },
+      { x: 50, y: 40, name: 'cdm' },
+      { x: 68, y: 40, name: 'rcm' },
+      { x: 88, y: 40, name: 'rw' },
+
+      { x: 50, y: 16, name: 'st' },
+    ],
+  },
+  '4-4-2': {
+    name: '4-4-2',
+    positions: [
+      { x: 50, y: 90, name: 'gk' },
+
+      { x: 61, y: 66, name: 'rcb' },
+      { x: 39, y: 66, name: 'lcb' },
+      { x: 17, y: 66, name: 'lb' },
+      { x: 82, y: 66, name: 'rb' },
+
+      { x: 17, y: 40, name: 'lw' },
+      { x: 39, y: 40, name: 'lcm' },
+      { x: 61, y: 40, name: 'rcm' },
+      { x: 82, y: 40, name: 'rw' },
+
+      { x: 39, y: 16, name: 'lf' },
+      { x: 61, y: 16, name: 'rf' },
+    ],
+  },
 }
 
 const currentFormation = computed(() => formations[selectedTactic.value] || [])

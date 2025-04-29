@@ -19,7 +19,7 @@ const exportFieldAsJPEG = async () => {
   if (!fieldRef.value) return
 
   const canvas = await html2canvas(fieldRef.value, {
-    backgroundColor: '#32CD32',
+    backgroundColor: 'white',
     scale: 2,
   })
 
@@ -176,9 +176,10 @@ watch(selectedTactic, (newVal) => {
   <main>
     <div class="flex flex-row gap-8 p-0">
       <div class="p-0">
-        <div class="shadow-black/50 shadow-md m-4">
-          <div id="field" ref="fieldRef" class="">
+        <div class="m-0 field-wrapper">
+          <div id="field" ref="fieldRef" class="p-6">
             <img
+              class="bg-img"
               src="@/assets/field-bg.png"
               alt=""
               style="display: block; width: 100%; height: 100%"
@@ -287,8 +288,19 @@ watch(selectedTactic, (newVal) => {
 
 <style lang="less">
 #field {
-  width: 540px;
-  height: 446px;
+  width: 658px;
+  height: 367px;
   position: relative;
+  background: url('@/assets/bgbg.jpg');
+  background-position: 0 0;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  img.bg-img {
+    opacity: 0.9;
+    filter: drop-shadow(2px 4px 14px black);
+    -webkit-filter: drop-shadow(2px 4px 14px black);
+    -moz-filter: drop-shadow(2px 4px 14px black);
+  }
 }
 </style>

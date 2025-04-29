@@ -253,15 +253,11 @@ watch(selectedTactic, (newVal) => {
                 />
               </td>
               <td class="p-2 w-[90px] border-b">
-                <select
+                <input
                   v-model="player.position"
-                  class="p-1 border border-gray-200 rounded text-sm w-full"
-                >
-                  <option disabled value="">-</option>
-                  <option v-for="pos in availablePositions" :key="pos" :value="pos">
-                    {{ pos.toUpperCase() }}
-                  </option>
-                </select>
+                  type="text"
+                  class="w-full px-2 py-1 border border-white rounded text-sm text-center"
+                />
               </td>
               <td class="p-2 border-b">
                 <input

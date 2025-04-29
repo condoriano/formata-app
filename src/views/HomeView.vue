@@ -29,22 +29,18 @@ const exportFieldAsJPEG = async () => {
   link.click()
 }
 
-const selectedTactic = ref('4-3-3 (4-1-2-3) a')
+const selectedTactic = ref('4-2-2-2')
 
 const players = ref([
   { number: 1, position: 'gk', name: 'Паша', nickname: 'Roxman_ua' },
   { number: 6, position: 'lcb', name: 'Паша', nickname: 'Mr_Filnyuk' },
   { number: 42, position: 'rcb', name: 'Влад', nickname: 'zouonrails' },
-  { number: 21, position: 'rb', name: 'Степан', nickname: 'skoromniy8' },
   { number: 31, position: 'rcb', name: 'Елік', nickname: 'stealth-maze7' },
   { number: 2, position: 'lb', name: 'Анатолій', nickname: 'Dawa-bro' },
   { number: 13, position: 'cdm', name: 'Артур', nickname: 'Ur mom s dad503' },
-  { number: 9, position: 'rcb', name: 'Вася', nickname: 'Vasya_Boyko11' },
   { number: 5, position: 'rcm', name: 'Іван', nickname: 'ivan052000' },
   { number: 7, position: 'lw', name: 'Андрій', nickname: 'Narutooaa' },
   { number: 0, position: 'lcm', name: 'Kevin', nickname: 'KevinSinister' },
-  { number: 0, position: 'st', name: 'Slasherlazy', nickname: 'Slasherlazy' },
-  { number: 99, position: 'rw', name: 'Діма', nickname: 'Swarthy-Handlle5' },
 ])
 
 const availablePositions = [
@@ -65,6 +61,22 @@ const availablePositions = [
 ]
 
 const formations: Record<string, Formation> = {
+  '4-2-2-2': {
+    name: '4-2-2-2',
+    positions: [
+      { x: 50, y: 90, name: 'gk' },
+      { x: 61, y: 71, name: 'rcb' },
+      { x: 39, y: 71, name: 'lcb' },
+      { x: 19, y: 68, name: 'lb' },
+      { x: 81, y: 68, name: 'rb' },
+      { x: 39, y: 46, name: 'ldm' },
+      { x: 60, y: 46, name: 'rdm' },
+      { x: 26, y: 27, name: 'lam' },
+      { x: 74, y: 27, name: 'ram' },
+      { x: 40, y: 16, name: 'lf' },
+      { x: 60, y: 16, name: 'rf' },
+    ],
+  },
   '4-3-3': {
     name: '4-3-3',
     positions: [

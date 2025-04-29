@@ -179,6 +179,11 @@ watch(selectedTactic, (newVal) => {
         <div class="m-0 field-wrapper">
           <div id="field" ref="fieldRef" class="p-6">
             <img
+              src="@/assets/logo.png"
+              alt=""
+              style="display: block; height: 100px; position: absolute; left: 0px; top: 20px"
+            />
+            <img
               class="bg-img"
               src="@/assets/field-bg.png"
               alt=""

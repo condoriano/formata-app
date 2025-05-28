@@ -3,6 +3,11 @@ import { ref, computed, watch, onMounted } from 'vue'
 import html2canvas from 'html2canvas'
 
 const PLAYERS_STORAGE_KEY = 'formata-players'
+const GRID_SIZE = 5
+
+function snapToGrid(value: number, gridSize = 5) {
+  return Math.round(value / gridSize) * gridSize
+}
 
 type Player = {
   number: number
@@ -176,13 +181,69 @@ onMounted(() => {
   }
 })
 
-watch(players, (newVal) => {
-  localStorage.setItem(PLAYERS_STORAGE_KEY, JSON.stringify(newVal))
-}, { deep: true })
+watch(
+  players,
+  (newVal) => {
+    localStorage.setItem(PLAYERS_STORAGE_KEY, JSON.stringify(newVal))
+  },
+  { deep: true },
+)
 
 watch(selectedTactic, (newVal) => {
   console.log(`Тактика изменена на: ${newVal}`)
 })
+
+const selectedFormationPositions = ref<Position[]>([])
+
+watch(
+  selectedTactic,
+  () => {
+    selectedFormationPositions.value = formations[selectedTactic.value]
+      ? formations[selectedTactic.value].positions.map((pos) => ({ ...pos }))
+      : []
+  },
+  { immediate: true },
+)
+
+const draggingIndex = ref<number | null>(null)
+const offset = ref({ x: 0, y: 0 })
+
+const onPositionMouseDown = (idx: number, event: MouseEvent) => {
+  draggingIndex.value = idx
+  if (!fieldRef.value) return
+  const fieldRect = (fieldRef.value as HTMLElement).getBoundingClientRect()
+  const pos = selectedFormationPositions.value[idx]
+  offset.value = {
+    x: event.clientX - (fieldRect.left + (pos.x / 100) * fieldRect.width),
+    y: event.clientY - (fieldRect.top + (pos.y / 100) * fieldRect.height),
+  }
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', onMouseUp)
+}
+
+const onMouseMove = (event: MouseEvent) => {
+  if (draggingIndex.value === null || !fieldRef.value) return
+  const fieldRect = (fieldRef.value as HTMLElement).getBoundingClientRect()
+  let newX = ((event.clientX - fieldRect.left - offset.value.x) / fieldRect.width) * 100
+  let newY = ((event.clientY - fieldRect.top - offset.value.y) / fieldRect.height) * 100
+
+  // Clamp within field
+  newX = Math.max(0, Math.min(100, newX))
+  newY = Math.max(0, Math.min(100, newY))
+
+  // Snap to grid
+  newX = snapToGrid(newX, GRID_SIZE)
+  newY = snapToGrid(newY, GRID_SIZE)
+
+  selectedFormationPositions.value[draggingIndex.value].x = newX
+  selectedFormationPositions.value[draggingIndex.value].y = newY
+}
+
+const onMouseUp = () => {
+  draggingIndex.value = null
+  window.removeEventListener('mousemove', onMouseMove)
+  window.removeEventListener('mouseup', onMouseUp)
+}
 </script>
 
 <template>
@@ -191,7 +252,9 @@ watch(selectedTactic, (newVal) => {
       <div class="p-0 m-4">
         <div class="m-0 field-wrapper">
           <div id="field" ref="fieldRef" class="p-6">
-            <div class="font-bold text-white text-center w-max max-w-[150px] p-0 m-0 text-xl uppercase">
+            <div
+              class="font-bold text-white text-center w-max max-w-[150px] p-0 m-0 text-xl uppercase"
+            >
               {{ selectedTactic }}
             </div>
             <img
@@ -201,18 +264,20 @@ watch(selectedTactic, (newVal) => {
               style="display: block; width: 100%; height: 100%"
             />
             <div
-              v-for="(pos, index) in currentFormation.positions"
+              v-for="(pos, index) in selectedFormationPositions"
               :key="index"
               class="absolute flex flex-col items-center"
               :style="{
                 left: pos.x + '%',
                 top: pos.y + '%',
                 transform: 'translate(-50%, -50%)',
+                zIndex: draggingIndex === index ? 10 : 1,
               }"
+              @mousedown="onPositionMouseDown(index, $event)"
             >
               <img src="@/assets/shirt.png" alt="" class="w-14 h-12 absolute" />
               <div
-                class="relative w-14 h-12 text-red-800 flex flex-col items-center justify-center font-bold text-sm text-center p-0 m-0"
+                class="relative cursor-grab select-none w-14 h-12 text-red-800 flex flex-col items-center justify-center font-bold text-sm text-center p-0 m-0"
               >
                 {{ findPlayerByPosition(pos.name)?.number || pos.name.toUpperCase() }}
               </div>
@@ -229,29 +294,31 @@ watch(selectedTactic, (newVal) => {
 
       <div class="flex-1 p-4">
         <div class="mb-4">
-          <label for="tactic" class="block mb-1 text-sm font-medium text-gray-700 uppercase">
-            Тактика
-          </label>
-          <select
-            v-model="selectedTactic"
-            class="w-full md:w-64 bg-white p-2 rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500 text-sm"
-          >
-            <option v-for="(formation, key) in formations" :key="key">
-              {{ formation.name }}
-            </option>
-          </select>
+          <div class="mb-4">
+            <label for="tactic" class="block mb-1 text-sm font-medium text-gray-700 uppercase">
+              Тактика
+            </label>
+            <select
+              v-model="selectedTactic"
+              class="w-full h-10 md:w-64 bg-white p-2 rounded-md border border-gray-300 focus:ring-sky-500 focus:border-sky-500 text-sm"
+            >
+              <option v-for="(formation, key) in formations" :key="key">
+                {{ formation.name }}
+              </option>
+            </select>
+          </div>
 
           <button
-            class="mb-4 mr-2 ml-2 px-4 py-1 bg-sky-800 text-white rounded hover:bg-sky-700"
+            class="h-10 mb-4 mr-2 px-4 py-1 bg-sky-800 text-white rounded hover:bg-sky-700 cursor-pointer"
             @click="exportFieldAsJPEG"
           >
-            JPEG
+            Завантажити JPEG
           </button>
           <button
             @click="addPlayer"
-            class="mb-4 px-4 py-1 bg-sky-800 text-white rounded hover:bg-sky-700"
+            class="h-10 mb-4 px-4 py-1 bg-sky-800 text-white rounded hover:bg-sky-700 cursor-pointer"
           >
-            Додати
+            Додати гравця
           </button>
         </div>
 

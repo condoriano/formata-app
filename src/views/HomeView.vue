@@ -1,6 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import html2canvas from 'html2canvas'
+
+const PLAYERS_STORAGE_KEY = 'formata-players'
+
+type Player = {
+  number: number
+  position: string
+  name: string
+  nickname: string
+}
 
 type Position = {
   x: number
@@ -31,18 +40,7 @@ const exportFieldAsJPEG = async () => {
 
 const selectedTactic = ref('3-1-4-2')
 
-const players = ref([
-  { number: 1, position: 'gk', name: 'Паша', nickname: 'Roxman_ua' },
-  { number: 6, position: 'rcb', name: 'Паша', nickname: 'Mr_Filnyuk' },
-  { number: 42, position: 'cb', name: 'Влад', nickname: 'zouonrails' },
-  { number: 31, position: '', name: 'Елік', nickname: 'stealth-maze7' },
-  { number: 2, position: 'lcb', name: 'Анатолій', nickname: 'Dawa-bro' },
-  { number: 13, position: 'rcm', name: 'Артур', nickname: 'Ur mom s dad503' },
-  { number: 5, position: 'rm', name: 'Іван', nickname: 'ivan052000' },
-  { number: 7, position: 'lm', name: 'Андрій', nickname: 'Narutooaa' },
-  { number: 0, position: 'cam', name: 'Kevin', nickname: 'KevinSinister' },
-  { number: 0, position: 'lcm', name: 'Vlad', nickname: 'Xngvld' },
-])
+const players = ref<Player[]>([])
 
 const formations: Record<string, Formation> = {
   '3-1-4-2': {
@@ -155,7 +153,7 @@ const formations: Record<string, Formation> = {
 const currentFormation = computed(() => formations[selectedTactic.value] || [])
 
 const findPlayerByPosition = (posName: string) => {
-  return players.value.find((p) => p.position === posName)
+  return players.value.find((p: Player) => p.position.toLowerCase() === posName.toLowerCase())
 }
 
 const addPlayer = () => {
@@ -167,22 +165,35 @@ const addPlayer = () => {
   })
 }
 
+onMounted(() => {
+  const saved = localStorage.getItem(PLAYERS_STORAGE_KEY)
+  if (saved) {
+    try {
+      players.value = JSON.parse(saved)
+    } catch {
+      players.value = []
+    }
+  }
+})
+
+watch(players, (newVal) => {
+  localStorage.setItem(PLAYERS_STORAGE_KEY, JSON.stringify(newVal))
+}, { deep: true })
+
 watch(selectedTactic, (newVal) => {
   console.log(`Тактика изменена на: ${newVal}`)
 })
 </script>
 
 <template>
-  <main>
-    <div class="flex flex-row gap-8 p-0">
-      <div class="p-0">
+  <main class="p-5">
+    <div class="flex flex-row gap-4 p-0">
+      <div class="p-0 m-4">
         <div class="m-0 field-wrapper">
           <div id="field" ref="fieldRef" class="p-6">
-            <img
-              src="@/assets/logo.png"
-              alt=""
-              style="display: block; height: 100px; position: absolute; left: 0px; top: 20px"
-            />
+            <div class="font-bold text-white text-center w-max max-w-[150px] p-0 m-0 text-xl uppercase">
+              {{ selectedTactic }}
+            </div>
             <img
               class="bg-img"
               src="@/assets/field-bg.png"
@@ -223,7 +234,7 @@ watch(selectedTactic, (newVal) => {
           </label>
           <select
             v-model="selectedTactic"
-            class="w-full md:w-64 p-2 rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500 text-sm"
+            class="w-full md:w-64 bg-white p-2 rounded-md border border-gray-300 focus:ring-green-500 focus:border-green-500 text-sm"
           >
             <option v-for="(formation, key) in formations" :key="key">
               {{ formation.name }}
@@ -231,30 +242,30 @@ watch(selectedTactic, (newVal) => {
           </select>
 
           <button
-            class="mb-4 mr-2 ml-2 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+            class="mb-4 mr-2 ml-2 px-4 py-1 bg-sky-800 text-white rounded hover:bg-sky-700"
             @click="exportFieldAsJPEG"
           >
             JPEG
           </button>
           <button
             @click="addPlayer"
-            class="mb-4 px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700 hover:bg-green-700"
+            class="mb-4 px-4 py-1 bg-sky-800 text-white rounded hover:bg-sky-700"
           >
             Додати
           </button>
         </div>
 
-        <table class="min-w-full border border-green-300 rounded-xl overflow-hidden">
-          <thead class="bg-green-200 text-left">
+        <table class="min-w-full border rounded-sm overflow-hidden">
+          <thead class="bg-white text-left">
             <tr>
-              <th class="p-3 border-b border-green-300">#</th>
-              <th class="p-3 border-b border-green-300">Позиція</th>
-              <th class="p-3 border-b border-green-300">Нікнейм</th>
-              <th class="p-3 border-b border-green-300">Імʼя</th>
+              <th class="p-3 border-b">#</th>
+              <th class="p-3 border-b">Позиція</th>
+              <th class="p-3 border-b">Нікнейм</th>
+              <th class="p-3 border-b">Імʼя</th>
             </tr>
           </thead>
           <tbody class="bg-white">
-            <tr v-for="player in players" :key="player.nickname" class="border-b even:bg-gray-50">
+            <tr v-for="(player, idx) in players" :key="idx" class="border-b even:bg-gray-50">
               <td class="p-2 w-16 border-b">
                 <input
                   v-model="player.number"
@@ -271,16 +282,17 @@ watch(selectedTactic, (newVal) => {
               </td>
               <td class="p-2 border-b">
                 <input
+                  name="player-nickname"
                   v-model="player.nickname"
                   type="text"
-                  class="w-full px-2 py-1 border border-gray-200 rounded text-sm"
+                  class="w-full px-2 py-1 border border-white rounded text-sm"
                 />
               </td>
               <td class="p-2 border-b">
                 <input
                   v-model="player.name"
                   type="text"
-                  class="w-full px-2 py-1 border border-gray-200 rounded text-sm"
+                  class="w-full px-2 py-1 border border-white rounded text-sm"
                 />
               </td>
             </tr>
@@ -292,8 +304,14 @@ watch(selectedTactic, (newVal) => {
 </template>
 
 <style lang="less">
+body {
+  background: white;
+}
+
 #field {
-  width: 658px;
+  border: 2px solid #588293;
+  border-radius: 4px;
+  width: 640px;
   height: 367px;
   position: relative;
   background: url('@/assets/bgbg.jpg');

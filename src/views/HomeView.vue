@@ -3,7 +3,33 @@ import { ref, computed, watch, onMounted } from 'vue'
 import html2canvas from 'html2canvas'
 
 const PLAYERS_STORAGE_KEY = 'formata-players'
+const LOGO_STORAGE_KEY = 'formata-logo'
 const GRID_SIZE = 5
+
+const logoUrl = ref('')
+
+const logoInputRef = ref<HTMLInputElement | null>(null)
+
+const triggerLogoUpload = () => {
+  logoInputRef.value?.click()
+}
+
+const onLogoUpload = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+
+  if (!file) return
+
+  const reader = new FileReader()
+  reader.onload = () => {
+    logoUrl.value = String(reader.result ?? '')
+  }
+  reader.readAsDataURL(file)
+}
+
+const removeLogo = () => {
+  logoUrl.value = ''
+}
 
 function snapToGrid(value: number, gridSize = 5) {
   return Math.round(value / gridSize) * gridSize
@@ -179,6 +205,11 @@ onMounted(() => {
       players.value = []
     }
   }
+
+  const savedLogo = localStorage.getItem(LOGO_STORAGE_KEY)
+  if (savedLogo) {
+    logoUrl.value = savedLogo
+  }
 })
 
 watch(
@@ -191,6 +222,14 @@ watch(
 
 watch(selectedTactic, (newVal) => {
   console.log(`Тактика изменена на: ${newVal}`)
+})
+
+watch(logoUrl, (newVal) => {
+  if (newVal) {
+    localStorage.setItem(LOGO_STORAGE_KEY, newVal)
+  } else {
+    localStorage.removeItem(LOGO_STORAGE_KEY)
+  }
 })
 
 const selectedFormationPositions = ref<Position[]>([])
@@ -257,6 +296,7 @@ const onMouseUp = () => {
             >
               {{ selectedTactic }}
             </div>
+            <img v-if="logoUrl" :src="logoUrl" alt="Team logo" class="field-logo" />
             <img
               class="bg-img"
               src="@/assets/field-bg.png"
@@ -294,6 +334,36 @@ const onMouseUp = () => {
 
       <div class="flex-1 p-4">
         <div class="mb-4">
+          <div class="mb-4">
+            <label class="block mb-1 text-sm font-medium text-gray-700 uppercase"> Логотип </label>
+
+            <input
+              ref="logoInputRef"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              class="hidden"
+              @change="onLogoUpload"
+            />
+
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                class="h-10 px-4 py-1 bg-sky-800 text-white rounded hover:bg-sky-700 cursor-pointer"
+                @click="triggerLogoUpload"
+              >
+                Обрати файл
+              </button>
+
+              <button
+                v-if="logoUrl"
+                type="button"
+                class="h-10 px-4 py-1 bg-gray-600 text-white rounded hover:bg-gray-500 cursor-pointer"
+                @click="removeLogo"
+              >
+                Видалити
+              </button>
+            </div>
+          </div>
           <div class="mb-4">
             <label for="tactic" class="block mb-1 text-sm font-medium text-gray-700 uppercase">
               Тактика
@@ -398,5 +468,16 @@ body {
   position: absolute;
   left: 10px;
   top: 10px;
+}
+
+.field-logo {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 86px;
+  height: 86px;
+  object-fit: contain;
+  z-index: 2;
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.6));
 }
 </style>

@@ -1,8 +1,8 @@
 import type { Formation } from '@/types/formation'
 
 export const formations: Record<string, Formation> = {
-  '4-3-3 (4-1-2-3) a': {
-    name: '4-3-3 (4-1-2-3) a',
+  '4-3-3 (4-1-2-3)': {
+    name: '4-3-3 (4-1-2-3)',
     positions: [
       { x: 50, y: 90, name: 'gk' },
       { x: 61, y: 71, name: 'rcb' },

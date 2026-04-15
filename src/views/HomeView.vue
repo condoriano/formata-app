@@ -3,52 +3,19 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { exportFieldAsJpeg } from '@/utils/exportFieldAsJpeg'
 import { formations } from '@/constants/formations'
 import { snapToGrid } from '@/utils/snapToGrid'
+import { useLogo } from '@/composables/useLogo'
+import { usePlayers } from '@/composables/usePlayers'
 
 const PLAYERS_STORAGE_KEY = 'formata-players'
-const LOGO_STORAGE_KEY = 'formata-logo'
 const GRID_SIZE = 5
 
-const logoUrl = ref('')
-
-const logoInputRef = ref<HTMLInputElement | null>(null)
-
-const triggerLogoUpload = () => {
-  logoInputRef.value?.click()
-}
-
-const onLogoUpload = (event: Event) => {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-
-  if (!file) return
-
-  const reader = new FileReader()
-  reader.onload = () => {
-    logoUrl.value = String(reader.result ?? '')
-  }
-  reader.readAsDataURL(file)
-}
-
-const removeLogo = () => {
-  logoUrl.value = ''
-}
-
-type Player = {
-  number: number
-  position: string
-  name: string
-  nickname: string
-}
+const { logoUrl, logoInputRef, triggerLogoUpload, onLogoUpload, removeLogo } = useLogo()
+const { players, addPlayer, findPlayerByPosition } = usePlayers()
 
 type Position = {
   x: number
   y: number
   name: string
-}
-
-type Formation = {
-  name: string
-  positions: Position[]
 }
 
 const fieldRef = ref(null)
@@ -59,24 +26,7 @@ const onExportFieldAsJpeg = async () => {
   await exportFieldAsJpeg(fieldRef.value)
 }
 
-const selectedTactic = ref('4-3-3 (4-1-2-3) a')
-
-const players = ref<Player[]>([])
-
-const currentFormation = computed(() => formations[selectedTactic.value] || [])
-
-const findPlayerByPosition = (posName: string) => {
-  return players.value.find((p: Player) => p.position.toLowerCase() === posName.toLowerCase())
-}
-
-const addPlayer = () => {
-  players.value.push({
-    number: 99,
-    position: '',
-    name: '',
-    nickname: '',
-  })
-}
+const selectedTactic = ref('4-3-3 (4-1-2-3)')
 
 onMounted(() => {
   const saved = localStorage.getItem(PLAYERS_STORAGE_KEY)
@@ -86,11 +36,6 @@ onMounted(() => {
     } catch {
       players.value = []
     }
-  }
-
-  const savedLogo = localStorage.getItem(LOGO_STORAGE_KEY)
-  if (savedLogo) {
-    logoUrl.value = savedLogo
   }
 })
 
@@ -104,14 +49,6 @@ watch(
 
 watch(selectedTactic, (newVal) => {
   console.log(`Тактика изменена на: ${newVal}`)
-})
-
-watch(logoUrl, (newVal) => {
-  if (newVal) {
-    localStorage.setItem(LOGO_STORAGE_KEY, newVal)
-  } else {
-    localStorage.removeItem(LOGO_STORAGE_KEY)
-  }
 })
 
 const selectedFormationPositions = ref<Position[]>([])

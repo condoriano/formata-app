@@ -43,11 +43,27 @@ const exportFieldAsJPEG = async () => {
   link.click()
 }
 
-const selectedTactic = ref('3-1-4-2')
+const selectedTactic = ref('4-3-3 (4-1-2-3) a')
 
 const players = ref<Player[]>([])
 
 const formations: Record<string, Formation> = {
+  '4-3-3 (4-1-2-3) a': {
+    name: '4-3-3 (4-1-2-3) a',
+    positions: [
+      { x: 50, y: 90, name: 'gk' },
+      { x: 61, y: 71, name: 'rcb' },
+      { x: 39, y: 71, name: 'lcb' },
+      { x: 19, y: 65, name: 'lb' },
+      { x: 81, y: 65, name: 'rb' },
+      { x: 35, y: 45, name: 'lcm' },
+      { x: 65, y: 45, name: 'rcm' },
+      { x: 50, y: 54, name: 'cdm' },
+      { x: 25, y: 30, name: 'lw' },
+      { x: 75, y: 30, name: 'rw' },
+      { x: 50, y: 25, name: 'st' },
+    ],
+  },
   '3-1-4-2': {
     name: '3-1-4-2',
     positions: [
@@ -98,22 +114,6 @@ const formations: Record<string, Formation> = {
       { x: 26, y: 28, name: 'lw' },
       { x: 74, y: 28, name: 'rw' },
       { x: 50, y: 28, name: 'st' },
-    ],
-  },
-  '4-3-3 (4-1-2-3) a': {
-    name: '4-3-3 (4-1-2-3) a',
-    positions: [
-      { x: 50, y: 90, name: 'gk' },
-      { x: 61, y: 71, name: 'rcb' },
-      { x: 39, y: 71, name: 'lcb' },
-      { x: 19, y: 65, name: 'lb' },
-      { x: 81, y: 65, name: 'rb' },
-      { x: 35, y: 41, name: 'lcm' },
-      { x: 65, y: 41, name: 'rcm' },
-      { x: 50, y: 54, name: 'cdm' },
-      { x: 19, y: 23, name: 'lw' },
-      { x: 80, y: 23, name: 'rw' },
-      { x: 50, y: 16, name: 'st' },
     ],
   },
   '4-5-1': {
@@ -253,7 +253,7 @@ const onMouseUp = () => {
         <div class="m-0 field-wrapper">
           <div id="field" ref="fieldRef" class="p-6">
             <div
-              class="font-bold text-white text-center w-max max-w-[150px] p-0 m-0 text-xl uppercase"
+              class="field-formation-title font-bold text-white text-center w-max max-w-[200px] p-0 m-0 text-xl uppercase"
             >
               {{ selectedTactic }}
             </div>
@@ -392,5 +392,11 @@ body {
     -webkit-filter: drop-shadow(2px 4px 14px black);
     -moz-filter: drop-shadow(2px 4px 14px black);
   }
+}
+
+.field-formation-title {
+  position: absolute;
+  left: 10px;
+  top: 10px;
 }
 </style>

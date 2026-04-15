@@ -40,6 +40,7 @@ npm run lint
 
 ## Deploy to GtHub Pages
 ```sh
+git add --force dist
 git subtree push --prefix dist origin gh-page
 ```
 
